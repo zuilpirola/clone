@@ -4,10 +4,10 @@ const express = require('express');
 
 const Pool = require("pg").Pool;
 const pool = new Pool({
-    user: "postgres",
-    host: "localhost",
-    database: "testeAPI",
-    password: "3131",
+    user: "bd950d6b2c",
+    host: "debaqi.pt",
+    database: "chatapp",
+    password: "6cd97a0ec45cc61093428d5dfef2c317",
     port: 5432
 });
 
@@ -21,7 +21,7 @@ api.use(express.static(__dirname));
 api.listen(3000, () => {
     console.log('API up and running!');
     console.log('http://localhost:3000')
-    console.log('--------------')
+    console.log('\n\n')
 });
 
 
@@ -38,7 +38,7 @@ api.get('/app', (req, res) => {
 // GET - Read persons 
 api.get("/api", (req, res) => {
     pool.query(
-        "Select * from persons",
+        "Select * from message",
         [],
         (error, results) => {
             if (error) {
