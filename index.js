@@ -11,16 +11,14 @@ const pool = new Pool({
     port: 5432
 });
 
-
-
 const api = express();
 api.use(express.static(__dirname));
 //api.use(cors());
 //api.use(bodyParser.json());
 
-api.listen(3000, () => {
+api.listen(3131, () => {
     console.log('API up and running!');
-    console.log('http://localhost:3000')
+    console.log('http://localhost:3131')
     console.log('\n\n')
 });
 
@@ -28,28 +26,27 @@ api.listen(3000, () => {
 /**
  * ROUTES
  */
-api.get('/app', (req, res) => {
-    console.log(req);
-    let response = JSON.parse('{"name":"John", "age":30, "city":"New York"}')
-    res.send(response);
-    console.log(response);
-});
 
-// GET - Read persons 
+// GET
 api.get("/api", (req, res) => {
     pool.query(
-        "Select * from message",
+        "Select * from message m " +
+        "join room r on m.room_id = r.id " +
+        "join topic t on r.topic_id = t.id " +
+        "join jhi_user ju on m.user_id = ju.id " +
+        "where t.topic = 'Futuro da escola: redes sociais'",
         [],
         (error, results) => {
             if (error) {
                 throw error;
             }
             res.status(200).json(results.rows);
+            //console.log(results.rows);
         }
     );
 });
 
-// GET - Read persons 
+// GET - Read form and create query 
 api.get("/teste", (req, res) => {
     let diaInicio = req.query["q3_de3"].day;
     let mesInicio = req.query["q3_de3"].month;
@@ -62,20 +59,19 @@ api.get("/teste", (req, res) => {
     let assunto = req.query.q6_assunto;
     let escola = req.query.q7_escola;
 
-    let anoEscolar = "";
-    let genero = "";
+    let anoEscolar;
+    let genero;
 
     console.log(Object.keys(req.query).length)
     console.log(diaInicio + '.' + mesInicio + '.' + anoInicio + '|' + diaFim + '.' + mesFim + '.' + anoFim + '|' + assunto + '|' + escola);
 
     if ((Object.keys(req.query).length) === 4) {  //não tem ano nem genero
-        //enviar todos os campos
+        anoEscolar = genero = ''
     }
     else if ((Object.keys(req.query).length) === 5) { //não tem um dos - ano || genero
         //Se [4] === 'q8_anoEscolar || [4] === 'q8_genero
         if (Object.keys(req.query)[4] === 'q8_anoEscolar') {
             anoEscolar = Object.values(req.query)[4];
-
         }
         if (Object.keys(req.query)[4] === 'q9_genero') {
             genero = Object.values(req.query)[4]
@@ -86,11 +82,30 @@ api.get("/teste", (req, res) => {
         genero = Object.values(req.query)[5];
     }
 
-   
-
     console.log(anoEscolar + '-' + genero)
-
     res.status(200).json(req.query);
+
+    /**
+     * Neste ponto está tudo preenchido
+     * Ler cada um dos dados e fazer a respectiva query
+     */
+
+
+    /*
+    Select * from message m
+    join room r on m.room_id = r.id 
+    join topic t on r.topic_id = t.id
+    join jhi_user ju on m.user_id = ju.id 
+    join user_details ud on ud.user_id = ju.id 
+    join institution i on ud.institution_id = i.id
+    where m."time" between '2021-10-14' and '2021-10-16'
+    and t.topic = 'Test topic'  
+    and i."name" = 'ES Gil Vicente - Lisboa'
+    anoEscolar???
+    and ud.gender = 'MALE'
+    */
+
+    
 
 });
 
