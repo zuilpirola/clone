@@ -20,14 +20,24 @@ api.listen(3131, () => {
     console.log('API up and running!');
     console.log('http://localhost:3131')
     console.log('\n\n')
+    
 });
 
 
 /**
  * ROUTES
  */
+api.get('/', function (req, res, next) {
+    res.status(200).send(
+        '<p>API de acesso à Base de Dados debaqi</p><br>' +
+        '<ul>'+
+        '<li>   /api - GET all messages from topic "Futuro da escola: redes sociais"</li>'+
+        '<li>   /oneroom - GET all messages from ROOM_ID = 9</li>'+
+        '<li>   /multiroom - GET all messages from topic "Futuro da escola: adaptação" </li>'+
+        '</ul>'
+    );
+});
 
-// GET
 api.get("/api", (req, res) => {
     pool.query(
         "Select * from message m " +
@@ -35,6 +45,43 @@ api.get("/api", (req, res) => {
         "join topic t on r.topic_id = t.id " +
         "join jhi_user ju on m.user_id = ju.id " +
         "where t.topic = 'Futuro da escola: redes sociais'",
+        [],
+        (error, results) => {
+            if (error) {
+                throw error;
+            }
+            res.status(200).json(results.rows);
+            //console.log(results.rows);
+        }
+    );
+});
+
+api.get("/oneroom", (req, res) => {
+    pool.query(
+        "Select * from message m " +
+        "join room r on m.room_id = r.id " +
+        "join topic t on r.topic_id = t.id " +
+        "join jhi_user ju on m.user_id = ju.id " +
+        "where m.room_id = 9",
+        [],
+        (error, results) => {
+            if (error) {
+                throw error;
+            }
+            res.status(200).json(results.rows);
+            //console.log(results.rows);
+        }
+    );
+});
+
+api.get("/multiroom", (req, res) => {
+    pool.query(
+        "Select * from message m " +
+        "join room r on m.room_id = r.id " +
+        "join topic t on r.topic_id = t.id " +
+        "join jhi_user ju on m.user_id = ju.id " +
+        "where t.topic = 'Futuro da escola: adaptação'"+
+        'order by "time"',
         [],
         (error, results) => {
             if (error) {
